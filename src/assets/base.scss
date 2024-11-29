@@ -1,0 +1,71 @@
+//设置Webkit浏览器滚动条的宽度为8像素，高度也为8像素
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+//设置滚动条轨道的背景颜色为浅灰色，并添加2像素的圆角
+::-webkit-scrollbar-track {
+  background: rgb(239, 239, 239);
+  border-radius: 2px;
+}
+
+//设置滚动条滑块的背景颜色为较深的灰色，并添加10像素的圆角
+::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 10px;
+}
+
+//当鼠标悬停在滚动条滑块上时，滑块的背景颜色保持不变（与非悬停状态相同）
+::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+//设置滚动条角落的背景颜色，通常这是滚动条在窗口角落的小块区域
+::-webkit-scrollbar-corner {
+  background: #bfbfbf;
+}
+
+//在文档根元素上定义了一组CSS自定义属性（变量），可以在CSS的其他部分通过var(--variable-name)引用
+:root {
+  --link: #007fff;
+  --pink: #ff6699;
+  --text2: #61666d;
+  --icon: #9499a0;
+}
+
+body {
+  padding: 0px;
+  margin: 0px;
+  font-size: 14px;
+  color: #636d7e;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0px;
+  border: 0px;
+  outline: 0;
+  vertical-align: middle; //垂直对齐方式为居中
+}
+
+.a-link {
+  text-decoration: none; //文本无下划线
+  color: var(--link);
+  cursor: pointer;
+}
+
+.el-form-item {
+  align-items: center;
+}
+
+.container-body {
+  margin: 0px auto;
+  padding-top: 5px;
+}
+
+.el-button {
+  .iconfont::before {
+    margin-right: 5px;
+  }
+}
