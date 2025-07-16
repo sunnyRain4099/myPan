@@ -1,29 +1,9 @@
-# easypan-front（在做项目的时候，没有传git仓库，完成之后，才进行上传，所以只有一次提交）
+# mypan（在做项目的时候，没有传git仓库，完成之后，才进行上传，所以只有一次提交）
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+# 项目描述：
+# 一个仿百度云盘面向PC端用户的网盘项目
+# 利用pinia对用户登录状态与密码存储等进行管理与持久化
+# 利用MD5摘要算法加密用户密码
+# 利用ECharts实现不同文件类型内存占比的可视化
+# 文件采用分片上传，断点续传，秒传
+# 利用APlayer，docx-preview，DPlayer等组件进行文件预览
