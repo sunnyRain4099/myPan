@@ -287,41 +287,53 @@ const uploadFile = async (uid, chunkIndex) => {
 //计算MD5
 const computeMd5 = (fileItem) => {
   let file = fileItem.file
-  let blobSlice =
-    File.prototype.slice ||
-    File.prototype.mozSlice ||
-    File.prototype.webkitSlice
+  let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice
   let chunks = Math.ceil(file.size / chunkSize)
-  let currentChunk = 0
+  
+  // 只计算三个分片的MD5：开头、中间和结尾
+  let chunksToCompute = [
+    0,  // 第一个分片
+    Math.floor(chunks / 2),  // 中间分片
+    chunks - 1  // 最后一个分片
+  ]
+  
+  let currentChunkIndex = 0  // 当前要计算的分片在chunksToCompute中的索引
   let spark = new SparkMD5.ArrayBuffer()
   let fileReader = new FileReader()
-
+  
   let loadNext = () => {
-    let start = currentChunk * chunkSize
+    if (currentChunkIndex >= chunksToCompute.length) {
+      // 所有要计算的分片都已处理完毕
+      let md5 = spark.end()
+      spark.destroy() //释放缓存
+      resultFile.md5Progress = 100
+      resultFile.status = STATUS.uploading.value
+      resultFile.md5 = md5
+      resolve(fileItem.uid)
+      return
+    }
+    
+    let chunkNumber = chunksToCompute[currentChunkIndex]
+    let start = chunkNumber * chunkSize
     let end = start + chunkSize >= file.size ? file.size : start + chunkSize
     fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
   }
+  
   loadNext()
 
   return new Promise((resolve, reject) => {
     let resultFile = getFileByUid(file.uid)
     fileReader.onload = (e) => {
       spark.append(e.target.result)
-      currentChunk++
-      if (currentChunk <= chunks) {
-        // console.log(`第${file.name},${currentChunk}分片解析完成，开始地${currentChunk + 1}`)
-        let percent = Math.floor((currentChunk / chunks) * 100)
-        resultFile.md5Progress = percent
-        loadNext()
-      } else {
-        let md5 = spark.end()
-        spark.destroy() //释放缓存
-        resultFile.md5Progress = 100
-        resultFile.status = STATUS.uploading.value
-        resultFile.md5 = md5
-        resolve(fileItem.uid)
-      }
+      currentChunkIndex++
+      
+      // 更新进度
+      let percent = Math.floor((currentChunkIndex / chunksToCompute.length) * 100)
+      resultFile.md5Progress = percent
+      
+      loadNext()
     }
+    
     fileReader.onerror = () => {
       resultFile.md5Progress = -1
       resultFile.status = STATUS.fail.value
@@ -331,6 +343,53 @@ const computeMd5 = (fileItem) => {
     return null
   })
 }
+
+// const computeMd5 = (fileItem) => {
+//   let file = fileItem.file
+//   let blobSlice =
+//     File.prototype.slice ||
+//     File.prototype.mozSlice ||
+//     File.prototype.webkitSlice
+//   let chunks = Math.ceil(file.size / chunkSize)
+//   let currentChunk = 0
+//   let spark = new SparkMD5.ArrayBuffer()
+//   let fileReader = new FileReader()
+
+//   let loadNext = () => {
+//     let start = currentChunk * chunkSize
+//     let end = start + chunkSize >= file.size ? file.size : start + chunkSize
+//     fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
+//   }
+//   loadNext()
+
+//   return new Promise((resolve, reject) => {
+//     let resultFile = getFileByUid(file.uid)
+//     fileReader.onload = (e) => {
+//       spark.append(e.target.result)
+//       currentChunk++
+//       if (currentChunk <= chunks) {
+//         // console.log(`第${file.name},${currentChunk}分片解析完成，开始地${currentChunk + 1}`)
+//         let percent = Math.floor((currentChunk / chunks) * 100)
+//         resultFile.md5Progress = percent
+//         loadNext()
+//       } else {
+//         let md5 = spark.end()
+//         spark.destroy() //释放缓存
+//         resultFile.md5Progress = 100
+//         resultFile.status = STATUS.uploading.value
+//         resultFile.md5 = md5
+//         resolve(fileItem.uid)
+//       }
+//     }
+//     fileReader.onerror = () => {
+//       resultFile.md5Progress = -1
+//       resultFile.status = STATUS.fail.value
+//       resolve(fileItem.uid)
+//     }
+//   }).catch((error) => {
+//     return null
+//   })
+// }
 
 //获取文件
 const getFileByUid = (uid) => {
