@@ -520,3 +520,4 @@ const share = (row) => {
 <style lang="scss" scoped>
 @import '@/assets/file.list.scss';
 </style>
+
