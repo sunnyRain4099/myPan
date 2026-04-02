@@ -11,7 +11,7 @@
         :rules="rules"
         ref="formDataRef"
       >
-        <div class="login-title">My云盘</div>
+        <div class="login-title">西柚网盘</div>
         <!--邮箱输入-->
         <el-form-item prop="email">
           <el-input
@@ -179,9 +179,9 @@
             <span v-if="opType == 2">重置密码</span>
           </el-button>
         </el-form-item>
-        <div class="login-btn-qq" v-if="opType == 1">
+        <!-- <div class="login-btn-qq" v-if="opType == 1">
           快捷登录（摆设） <img src="@/assets/qq.png" @click="qqLogin" />
-        </div>
+        </div> -->
       </el-form>
     </div>
     <!--发送邮箱验证码-->
@@ -375,85 +375,6 @@ const resetForm = () => {
 }
 import { useAuthStore } from '@/stores/authStore'
 const authStore = useAuthStore()
-const doSubmit = () => {
-  formDataRef.value.validate(async (valid) => {
-    if (!valid) {
-      return
-    }
-    let params = {}
-    Object.assign(params, formData.value)
-
-    // 注册
-    if (opType.value == 0 || opType.value == 2) {
-      params.password = params.registerPassword
-      delete params.registerPassword
-      delete params.reRegisterPassword
-    }
-
-    // 登录
-    if (opType.value == 1) {
-      let cookieLoginInfo = localStorage.getItem('loginInfo')
-      let cookiePassword = cookieLoginInfo
-        ? JSON.parse(cookieLoginInfo).password
-        : null
-      if (params.password !== cookiePassword) {
-        params.password = md5(params.password)
-      }
-    }
-
-    let url = null
-    if (opType.value == 0) {
-      url = api.register
-    } else if (opType.value == 1) {
-      url = api.login
-    } else if (opType.value == 2) {
-      url = api.resetPwd
-    }
-
-    let result = await proxy.Request({
-      url: url,
-      params: params,
-      errorCallback: () => {
-        changeCheckCode(0)
-      }
-    })
-
-    if (!result) {
-      return
-    }
-
-    // 注册返回
-    if (opType.value == 0) {
-      proxy.Message.success('注册成功,请登录')
-      showPanel(1)
-    } else if (opType.value == 1) {
-      // 登录
-      if (params.rememberMe) {
-        const loginInfo = {
-          email: params.email,
-          password: params.password,
-          rememberMe: params.rememberMe
-        }
-        authStore.setLoginInfo(loginInfo)
-      } else {
-        authStore.clearLoginInfo()
-      }
-      proxy.Message.success('登录成功')
-      // 存储用户信息
-      console.log(result.data)
-      authStore.setUserInfo(result.data)
-      // 重定向到原始页面
-      const redirectUrl = route.query.redirectUrl || '/'
-      router.push(redirectUrl)
-    } else if (opType.value == 2) {
-      // 重置密码
-      proxy.Message.success('重置密码成功,请登录')
-      showPanel(1)
-    }
-  })
-}
-
-// 登录、注册、重置密码  提交表单
 // const doSubmit = () => {
 //   formDataRef.value.validate(async (valid) => {
 //     if (!valid) {
@@ -461,21 +382,25 @@ const doSubmit = () => {
 //     }
 //     let params = {}
 //     Object.assign(params, formData.value)
-//     //注册
+
+//     // 注册
 //     if (opType.value == 0 || opType.value == 2) {
 //       params.password = params.registerPassword
 //       delete params.registerPassword
 //       delete params.reRegisterPassword
 //     }
-//     //登录
+
+//     // 登录
 //     if (opType.value == 1) {
-//       let cookieLoginInfo = proxy.VueCookies.get('loginInfo')
-//       let cookiePassword =
-//         cookieLoginInfo == null ? null : cookieLoginInfo.password
+//       let cookieLoginInfo = localStorage.getItem('loginInfo')
+//       let cookiePassword = cookieLoginInfo
+//         ? JSON.parse(cookieLoginInfo).password
+//         : null
 //       if (params.password !== cookiePassword) {
 //         params.password = md5(params.password)
 //       }
 //     }
+
 //     let url = null
 //     if (opType.value == 0) {
 //       url = api.register
@@ -484,6 +409,7 @@ const doSubmit = () => {
 //     } else if (opType.value == 2) {
 //       url = api.resetPwd
 //     }
+
 //     let result = await proxy.Request({
 //       url: url,
 //       params: params,
@@ -491,39 +417,115 @@ const doSubmit = () => {
 //         changeCheckCode(0)
 //       }
 //     })
+
 //     if (!result) {
 //       return
 //     }
-//     //注册返回
+
+//     // 注册返回
 //     if (opType.value == 0) {
 //       proxy.Message.success('注册成功,请登录')
 //       showPanel(1)
 //     } else if (opType.value == 1) {
-//       //登录
+//       // 登录
 //       if (params.rememberMe) {
 //         const loginInfo = {
 //           email: params.email,
 //           password: params.password,
 //           rememberMe: params.rememberMe
 //         }
-//         proxy.VueCookies.set('loginInfo', loginInfo, '7d')
+//         authStore.setLoginInfo(loginInfo)
 //       } else {
-//         proxy.VueCookies.remove('loginInfo')
+//         authStore.clearLoginInfo()
 //       }
 //       proxy.Message.success('登录成功')
-//       //存储cookie
+//       // 存储用户信息
 //       console.log(result.data)
-//       proxy.VueCookies.set('userInfo', result.data, 0)
-//       //重定向到原始页面
+//       authStore.setUserInfo(result.data)
+//       // 重定向到原始页面
 //       const redirectUrl = route.query.redirectUrl || '/'
 //       router.push(redirectUrl)
 //     } else if (opType.value == 2) {
-//       //重置密码
+//       // 重置密码
 //       proxy.Message.success('重置密码成功,请登录')
 //       showPanel(1)
 //     }
 //   })
 // }
+
+// 登录、注册、重置密码  提交表单
+const doSubmit = () => {
+  formDataRef.value.validate(async (valid) => {
+    if (!valid) {
+      return
+    }
+    let params = {}
+    Object.assign(params, formData.value)
+    //注册
+    if (opType.value == 0 || opType.value == 2) {
+      params.password = params.registerPassword
+      delete params.registerPassword
+      delete params.reRegisterPassword
+    }
+    //登录
+    if (opType.value == 1) {
+      let cookieLoginInfo = proxy.VueCookies.get('loginInfo')
+      let cookiePassword =
+        cookieLoginInfo == null ? null : cookieLoginInfo.password
+      if (params.password !== cookiePassword) {
+        params.password = md5(params.password)
+      }
+    }
+    let url = null
+    if (opType.value == 0) {
+      url = api.register
+    } else if (opType.value == 1) {
+      url = api.login
+    } else if (opType.value == 2) {
+      url = api.resetPwd
+    }
+    let result = await proxy.Request({
+      url: url,
+      params: params,
+      errorCallback: () => {
+        changeCheckCode(0)
+      }
+    })
+    if (!result) {
+      return
+    }
+    //注册返回
+    if (opType.value == 0) {
+      proxy.Message.success('注册成功,请登录')
+      showPanel(1)
+    } else if (opType.value == 1) {
+      //登录
+      if (params.rememberMe) {
+        const loginInfo = {
+          email: params.email,
+          password: params.password,
+          rememberMe: params.rememberMe
+        }
+        proxy.VueCookies.set('loginInfo', loginInfo, '7d')
+      } else {
+        proxy.VueCookies.remove('loginInfo')
+      }
+      proxy.Message.success('登录成功')
+      //存储cookie
+      console.log(result.data)
+      proxy.VueCookies.set('userInfo', result.data, 0)
+      //更新 Pinia store
+      authStore.setUserInfo(result.data)
+      //重定向到原始页面
+      const redirectUrl = route.query.redirectUrl || '/'
+      router.push(redirectUrl)
+    } else if (opType.value == 2) {
+      //重置密码
+      proxy.Message.success('重置密码成功,请登录')
+      showPanel(1)
+    }
+  })
+}
 
 //QQ登录
 const qqLogin = async () => {
@@ -556,7 +558,7 @@ const qqLogin = async () => {
     background-position: center;
     background-size: 800px;
     background-repeat: no-repeat; //背景图片不重复
-    background-image: url(../assets/login_liu.png);
+    background-image: url(../assets/login_imgs.png);
   }
   .login-panel {
     width: 430px;

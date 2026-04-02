@@ -84,11 +84,11 @@ const router = createRouter({
       name: '分享',
       component: () => import('@/views/webshare/Share.vue')
     },
-    {
-      path: '/qqlogincalback',
-      name: 'qq登录回调',
-      component: () => import('@/views/QqLoginCallback.vue')
-    }
+    // {
+    //   path: '/qqlogincalback',
+    //   name: 'qq登录回调',
+    //   component: () => import('@/views/QqLoginCallback.vue')
+    // }
   ]
 })
 
@@ -96,9 +96,9 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   //   const userInfo = VueCookies.get('userInfo')
   const userInfo = authStore.userInfo
-  if (to.meta.needLogin != null && to.meta.needLogin && userInfo == null) {
-    router.push('/login')
-  }
+  // if (to.meta.needLogin != null && to.meta.needLogin && userInfo == null) {
+  //   router.push('/login')
+  // }
   next()
 })
 

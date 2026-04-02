@@ -5,7 +5,7 @@
       <span class="tips">(仅展示本次上传任务)</span>
     </div>
     <div class="file-list">
-      <div v-for="(item, index) in fileList" class="file-item">
+      <div v-for="(item, index) in fileList" :key="item.uid" class="file-item">
         <div class="upload-panel">
           <div class="file-name">
             {{ item.fileName }}
@@ -300,29 +300,28 @@ const computeMd5 = (fileItem) => {
   let currentChunkIndex = 0  // 当前要计算的分片在chunksToCompute中的索引
   let spark = new SparkMD5.ArrayBuffer()
   let fileReader = new FileReader()
-  
-  let loadNext = () => {
-    if (currentChunkIndex >= chunksToCompute.length) {
-      // 所有要计算的分片都已处理完毕
-      let md5 = spark.end()
-      spark.destroy() //释放缓存
-      resultFile.md5Progress = 100
-      resultFile.status = STATUS.uploading.value
-      resultFile.md5 = md5
-      resolve(fileItem.uid)
-      return
-    }
-    
-    let chunkNumber = chunksToCompute[currentChunkIndex]
-    let start = chunkNumber * chunkSize
-    let end = start + chunkSize >= file.size ? file.size : start + chunkSize
-    fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
-  }
-  
-  loadNext()
 
   return new Promise((resolve, reject) => {
     let resultFile = getFileByUid(file.uid)
+
+    let loadNext = () => {
+      if (currentChunkIndex >= chunksToCompute.length) {
+        // 所有要计算的分片都已处理完毕
+        let md5 = spark.end()
+        spark.destroy() //释放缓存
+        resultFile.md5Progress = 100
+        resultFile.status = STATUS.uploading.value
+        resultFile.md5 = md5
+        resolve(fileItem.uid)
+        return
+      }
+
+      let chunkNumber = chunksToCompute[currentChunkIndex]
+      let start = chunkNumber * chunkSize
+      let end = start + chunkSize >= file.size ? file.size : start + chunkSize
+      fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
+    }
+
     fileReader.onload = (e) => {
       spark.append(e.target.result)
       currentChunkIndex++
@@ -339,6 +338,8 @@ const computeMd5 = (fileItem) => {
       resultFile.status = STATUS.fail.value
       resolve(fileItem.uid)
     }
+
+    loadNext()
   }).catch((error) => {
     return null
   })

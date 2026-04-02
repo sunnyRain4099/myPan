@@ -3,7 +3,7 @@
     <div class="body-content">
       <div class="logo">
         <span class="iconfont icon-pan"></span>
-        <span class="name">Easy云盘</span>
+        <span class="name">西柚网盘</span>
       </div>
       <div class="code-panel">
         <div class="file-info">

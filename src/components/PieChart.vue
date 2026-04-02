@@ -26,7 +26,11 @@ const initChart = () => {
         left: 'center'
       },
       tooltip: {
-        trigger: 'item'
+        trigger: 'item',
+        formatter: (params) => {
+          const valueInMB = (params.value / 1024 / 1024).toFixed(2)
+          return `${params.name}: ${valueInMB} MB (${params.percent}%)`
+        }
       },
       legend: {
         orient: 'vertical',

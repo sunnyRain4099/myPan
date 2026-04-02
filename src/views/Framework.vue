@@ -1,31 +1,7 @@
 <template>
   <div class="framework">
     <div class="header">
-      <div class="logo">
-        <span class="iconfont iconfont-pan"></span>
-        <div class="name">My云盘</div>
-      </div>
-      <div class="right-panel">
-        <el-popover
-          :width="800"
-          trigger="click"
-          v-model:visible="showUploader"
-          :offset="20"
-          transition="none"
-          :hide-after="0"
-          :popper-style="{ padding: '0px' }"
-        >
-          <template #reference>
-            <span class="iconfont icon-transfer"></span>
-          </template>
-          <template #default>
-            <Uploader
-              ref="uploaderRef"
-              @uploadCallback="uploadCallbackHandler"
-            ></Uploader>
-          </template>
-        </el-popover>
-
+      <div class="left-panel">
         <el-dropdown>
           <div class="user-info">
             <div class="avatar">
@@ -51,6 +27,31 @@
           </template>
         </el-dropdown>
       </div>
+      <div class="logo">
+        <span class="iconfont iconfont-pan"></span>
+        <div class="name">西柚网盘</div>
+      </div>
+      <div class="right-panel">
+        <el-popover
+          :width="800"
+          trigger="click"
+          v-model:visible="showUploader"
+          :offset="20"
+          transition="none"
+          :hide-after="0"
+          :popper-style="{ padding: '0px' }"
+        >
+          <template #reference>
+            <span class="iconfont icon-transfer"></span>
+          </template>
+          <template #default>
+            <Uploader
+              ref="uploaderRef"
+              @uploadCallback="uploadCallbackHandler"
+            ></Uploader>
+          </template>
+        </el-popover>
+      </div>
     </div>
 
     <div class="body">
@@ -63,8 +64,9 @@
               item.menuCode == currentMenu.menuCode ? 'active' : ''
             ]"
             v-for="item in menus"
+            :key="item.menuCode"
           >
-            <div :class="['iconfont', 'icon-' + item.icon]"></div>
+            <img :src="item.icon" class="menu-icon" />
             <div class="text">{{ item.name }}</div>
           </div>
         </div>
@@ -73,11 +75,9 @@
             @click="jump(sub)"
             :class="['menu-item-sub', currentPath == sub.path ? 'active' : '']"
             v-for="sub in currentMenu.children"
+            :key="sub.path"
           >
-            <span
-              :class="['iconfont', 'icon-' + sub.icon]"
-              v-if="sub.icon"
-            ></span>
+            <img :src="sub.icon" class="menu-sub-icon" v-if="sub.icon" />
             <span class="text">{{ sub.name }}</span>
           </div>
           <div class="tips" v-if="currentMenu && currentMenu.tips">
@@ -137,7 +137,7 @@
 
 <script setup>
 import PieChart from '@/components/PieChart.vue'
-import { ref, getCurrentInstance, watch, nextTick, onMounted } from 'vue'
+import { ref, getCurrentInstance, watch, nextTick, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import UpdateAvatar from './UpdateAvatar.vue'
 import UpdatePassword from './UpdatePassword.vue'
@@ -208,7 +208,33 @@ const loadDataList = async () => {
     return
   }
   tableData.value = result.data
-  await tableData.value.list.forEach((data) => {
+  updateData()
+}
+
+// 计算各类别空间使用量
+const calculateSpaceUsage = async () => {
+  // 重置计数器
+  vidSpace.value = 0
+  musSpace.value = 0
+  imgSpace.value = 0
+  docSpace.value = 0
+  moreSpace.value = 0
+
+  // 获取所有文件（不分页）
+  let result = await proxy.Request({
+    url: api.loadDataList,
+    showLoading: false,
+    params: {
+      pageNo: 1,
+      pageSize: 99999,
+      category: 'all',
+      filePid: '0'
+    }
+  })
+  if (!result) {
+    return
+  }
+  result.data.list.forEach((data) => {
     if (data.fileCategory == '1') {
       vidSpace.value += data.fileSize
     } else if (data.fileCategory == '2') {
@@ -227,6 +253,7 @@ const loadDataList = async () => {
 onMounted(() => {
   getUseSpace()
   loadDataList()
+  calculateSpaceUsage()
 })
 
 const showUploader = ref(false)
@@ -252,48 +279,48 @@ const uploadCallbackHandler = () => {
 const timestamp = ref(0)
 
 // const userInfo = ref(proxy.VueCookies.get('userInfo'))
-const userInfo = ref(authStore.userInfo)
+const userInfo = computed(() => authStore.userInfo || {})
 
 const menus = [
   {
-    icon: 'cloude',
+    icon: '/src/assets/icon-image/Cloud.png',
     name: '首页',
     menuCode: 'main',
     path: '/main/all',
     allShow: true,
     children: [
       {
-        icon: 'all',
+        icon: '/src/assets/icon-image/All.png',
         name: '全部',
         category: 'all',
         path: '/main/all'
       },
       {
-        icon: 'video',
+        icon: '/src/assets/icon-image/Videos.png',
         name: '视频',
         category: 'video',
         path: '/main/video'
       },
       {
-        icon: 'music',
+        icon: '/src/assets/icon-image/Musics.png',
         name: '音频',
         category: 'music',
         path: '/main/music'
       },
       {
-        icon: 'image',
+        icon: '/src/assets/icon-image/Images.png',
         name: '图片',
         category: 'image',
         path: '/main/image'
       },
       {
-        icon: 'doc',
+        icon: '/src/assets/icon-image/Doc.png',
         name: '文档',
         category: 'doc',
         path: '/main/doc'
       },
       {
-        icon: 'more',
+        icon: '/src/assets/icon-image/More.png',
         name: '其他',
         category: 'others',
         path: '/main/others'
@@ -302,7 +329,7 @@ const menus = [
   },
   {
     path: '/myshare',
-    icon: 'share',
+    icon: '/src/assets/icon-image/Share.png',
     name: '分享',
     menuCode: 'share',
     allShow: true,
@@ -315,7 +342,7 @@ const menus = [
   },
   {
     path: '/recycle',
-    icon: 'del',
+    icon: '/src/assets/icon-image/Dels.png',
     name: '回收站',
     menuCode: 'recycle',
     tips: '回收站为你保存10天内删除的文件',
@@ -329,7 +356,7 @@ const menus = [
   },
   {
     path: '/settings/fileList',
-    icon: 'settings',
+    icon: '/src/assets/icon-image/Setting.png',
     name: '设置',
     menuCode: 'settings',
     allShow: false,
@@ -383,8 +410,6 @@ const updateAvatar = () => {
   updateAvatarRef.value.show(userInfo.value)
 }
 const reloadAvatar = () => {
-  // userInfo.value = proxy.VueCookies.get('userInfo')
-  userInfo.value = authStore.userInfo
   timestamp.value = new Date().getTime()
 }
 
@@ -449,23 +474,27 @@ const getUseSpace = async () => {
       color: #05a1f5;
     }
   }
+  .left-panel {
+    display: flex;
+    align-items: center;
+    .user-info {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      .avatar {
+        margin-right: 10px;
+      }
+      .nick-name {
+        color: #05a1f5;
+        font-weight: bold;
+      }
+    }
+  }
   .right-panel {
     display: flex;
     align-items: center;
     .icon-transfer {
       cursor: pointer;
-    }
-    .user-info {
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      .avatar {
-        margin: 0px 5px 0px 15px;
-      }
-      .nick-name {
-        color: #05a1f5;
-      }
     }
   }
 }
@@ -488,14 +517,16 @@ const getUseSpace = async () => {
         &:hover {
           background: #f3f3f3;
         }
-        .iconfont {
-          font-weight: normal;
-          font-size: 28px;
+        .menu-icon {
+          width: 28px;
+          height: 28px;
+          display: block;
+          margin: 0 auto 5px;
         }
       }
       .active {
-        .iconfont {
-          color: #06a7ff;
+        .menu-icon {
+          filter: hue-rotate(200deg) saturate(2);
         }
         .text {
           color: #06a7ff;
@@ -511,12 +542,16 @@ const getUseSpace = async () => {
         line-height: 40px;
         border-radius: 5px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         &:hover {
           background: #f3f3f3;
         }
-        .iconfont {
-          font-size: 14px;
-          margin-right: 20px;
+        .menu-sub-icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 10px;
         }
         .text {
           font-size: 13px;
@@ -524,8 +559,8 @@ const getUseSpace = async () => {
       }
       .active {
         background: #eef9fe;
-        .iconfont {
-          color: #05a1f5;
+        .menu-sub-icon {
+          filter: hue-rotate(200deg) saturate(2);
         }
         .text {
           color: #05a1f5;
