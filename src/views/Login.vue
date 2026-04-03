@@ -558,7 +558,7 @@ const qqLogin = async () => {
     background-position: center;
     background-size: 800px;
     background-repeat: no-repeat; //背景图片不重复
-    background-image: url(../assets/login_imgs.png);
+    background-image: url(../assets/liu.jpg);
   }
   .login-panel {
     width: 430px;

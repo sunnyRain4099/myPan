@@ -24,6 +24,7 @@
             v-for="btn in buttons"
             :type="btn.type || 'primary'"
             @click="btn.click"
+            :key="btn.text"
           >
             {{ btn.text }}
           </el-button>

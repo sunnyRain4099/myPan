@@ -44,7 +44,7 @@ const fileTypeMap = {
 
 const getImage = () => {
   if (props.cover) {
-    return proxy.globalInfo.imageUrl + props.cover
+    return proxy.globalInfo.imageUrl + props.cover.replaceAll('_.', '.')
   }
   let icon = 'unknow_icon'
   if (props.iconName) {
@@ -55,7 +55,7 @@ const getImage = () => {
       icon = iconMap['icon']
     }
   }
-  return new URL(`/src/assets/icon-image/${icon}.png`, import.meta.url).href
+  return `/icon-image/${icon}.png`
 }
 </script>
 

@@ -283,44 +283,44 @@ const userInfo = computed(() => authStore.userInfo || {})
 
 const menus = [
   {
-    icon: '/src/assets/icon-image/Cloud.png',
+    icon: '/icon-image/Cloud.png',
     name: '首页',
     menuCode: 'main',
     path: '/main/all',
     allShow: true,
     children: [
       {
-        icon: '/src/assets/icon-image/All.png',
+        icon: '/icon-image/All.png',
         name: '全部',
         category: 'all',
         path: '/main/all'
       },
       {
-        icon: '/src/assets/icon-image/Videos.png',
+        icon: '/icon-image/Videos.png',
         name: '视频',
         category: 'video',
         path: '/main/video'
       },
       {
-        icon: '/src/assets/icon-image/Musics.png',
+        icon: '/icon-image/musics.png',
         name: '音频',
         category: 'music',
         path: '/main/music'
       },
       {
-        icon: '/src/assets/icon-image/Images.png',
+        icon: '/icon-image/Images.png',
         name: '图片',
         category: 'image',
         path: '/main/image'
       },
       {
-        icon: '/src/assets/icon-image/Doc.png',
+        icon: '/icon-image/Doc.png',
         name: '文档',
         category: 'doc',
         path: '/main/doc'
       },
       {
-        icon: '/src/assets/icon-image/More.png',
+        icon: '/icon-image/More.png',
         name: '其他',
         category: 'others',
         path: '/main/others'
@@ -329,7 +329,7 @@ const menus = [
   },
   {
     path: '/myshare',
-    icon: '/src/assets/icon-image/Share.png',
+    icon: '/icon-image/Share.png',
     name: '分享',
     menuCode: 'share',
     allShow: true,
@@ -342,7 +342,7 @@ const menus = [
   },
   {
     path: '/recycle',
-    icon: '/src/assets/icon-image/Dels.png',
+    icon: '/icon-image/Dels.png',
     name: '回收站',
     menuCode: 'recycle',
     tips: '回收站为你保存10天内删除的文件',
@@ -356,7 +356,7 @@ const menus = [
   },
   {
     path: '/settings/fileList',
-    icon: '/src/assets/icon-image/Setting.png',
+    icon: '/icon-image/Setting.png',
     name: '设置',
     menuCode: 'settings',
     allShow: false,
